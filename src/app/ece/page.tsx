@@ -1,6 +1,8 @@
 
 "use client";
 
+import ReactMarkdown from "react-markdown";
+
 import {
   useEffect,
   useRef,
@@ -203,7 +205,7 @@ export default function EcePage() {
                   item.role === "user"
                     ? "#dcebdd"
                     : "#f3f5f2",
-                whiteSpace: "pre-wrap",
+                whiteSpace: item.role === "user" ? "pre-wrap" : "normal",
                 overflowWrap: "anywhere",
                 lineHeight: 1.6,
               }}
@@ -211,9 +213,34 @@ export default function EcePage() {
               <strong style={{ fontSize: 13 }}>
                 {item.role === "user" ? "Sen" : "Ece"}
               </strong>
-              <div style={{ marginTop: 6 }}>
-                {item.content}
-              </div>
+
+            <div style={{ marginTop: 6 }}>
+              {item.role === "assistant" ? (
+                <ReactMarkdown
+                  components={{
+                    p: ({ children }) => (
+                      <p style={{ margin: "6px 0" }}>{children}</p>
+                    ),
+                    ul: ({ children }) => (
+                      <ul
+                        style={{
+                          paddingLeft: 22,
+                          listStyleType: "disc",
+                          margin: "8px 0",
+                        }}
+                      >
+                        {children}
+                      </ul>
+                    ),
+                  }}
+                >
+                  {item.content}
+                </ReactMarkdown>
+              ) : (
+                item.content
+              )}
+            </div>
+
             </div>
           ))}
 

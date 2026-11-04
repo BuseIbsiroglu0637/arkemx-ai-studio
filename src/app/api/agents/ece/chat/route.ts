@@ -19,7 +19,7 @@ import { StudioError } from "@/server/errors";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-// Kaydedilmiş konuşmaları getir
+// Ece'nin geçmiş konuşmalarını getir
 export function GET(request: Request) {
   try {
     assertLocalRequest(request);
@@ -35,7 +35,7 @@ export function GET(request: Request) {
   }
 }
 
-// Ece'ye mesaj gönder ve konuşmayı kaydet
+// Ece'ye mesaj gönder
 export async function POST(request: Request) {
   try {
     assertLocalRequest(request, true);
@@ -67,9 +67,10 @@ export async function POST(request: Request) {
 
     const userMessage = body.message.trim();
 
+    // Ollama'dan gerçek yanıtı al
     const reply = await chatWithEce(userMessage);
 
-    // Kullanıcı mesajı ve Ece'nin yanıtını SQLite'a kaydet
+    // Başarılı konuşmayı SQLite'a kaydet
     saveEceExchange(userMessage, reply);
 
     return NextResponse.json({
