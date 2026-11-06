@@ -1,0 +1,382 @@
+
+/* ==========================================
+   ARKEMX AI STUDIO — MIDNIGHT VIOLET
+   Global Dark Purple Theme
+   ========================================== */
+
+:root {
+  color-scheme: dark;
+
+  --canvas: #0b0914;
+  --ink: #f4efff;
+  --text: #eee8fa;
+  --muted: #b8aacc;
+  --border: #392c50;
+
+  --green: #8050e2;
+  --green-dark: #6a39c8;
+  --green-soft: #2b1d43;
+  --white: #171226;
+
+  --purple-accent: #a780ff;
+  --purple-soft: #d8c3ff;
+  --purple-panel: #211933;
+  --purple-surface: #171226;
+}
+
+/* GENEL SAYFA */
+
+html,
+body {
+  background: var(--canvas) !important;
+  color: var(--text);
+}
+
+body {
+  background-image: radial-gradient(
+    ellipse at 70% 0%,
+    #211335 0%,
+    #0b0914 65%
+  ) !important;
+}
+
+::selection {
+  background: #7450aa;
+  color: white;
+}
+
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline-color: #b79aff !important;
+}
+
+input,
+textarea,
+select {
+  color-scheme: dark;
+}
+
+/* ANA EKİP EKRANI */
+
+.sidebar,
+.topbar,
+.workspace-dialog {
+  background: #171226 !important;
+  border-color: #392c50 !important;
+  color: #f4efff !important;
+}
+
+.topbar {
+  background: #130f20 !important;
+}
+
+.workspace-switch,
+.sidebar-note,
+.welcome-banner,
+.team-stats,
+.member-card,
+.search-field,
+.department-filter,
+.view-switch,
+.empty-results,
+.profile-project-panel,
+.cv-summary,
+.history-empty,
+.connection-explanation,
+.connection-empty,
+.toast {
+  background: #211933 !important;
+  color: #eee8fa !important;
+  border-color: #44335b !important;
+}
+
+.welcome-banner {
+  background: linear-gradient(
+    120deg,
+    #30194d,
+    #1c142d 65%,
+    #301a4b
+  ) !important;
+}
+
+.studio-mark,
+.button-primary {
+  background: #8050e2 !important;
+  color: #ffffff !important;
+}
+
+.nav-item.active,
+.nav-item:hover:not(:disabled),
+.view-switch button.selected {
+  background: #35224f !important;
+  color: #decaff !important;
+}
+
+.page-heading h1,
+.section-heading h2,
+.member-main h3,
+.welcome-banner h2,
+.profile-hero h3,
+.dialog-heading h2,
+.brand strong {
+  color: #f4efff !important;
+}
+
+.nav-item,
+.page-subtitle,
+.member-role,
+.member-description,
+.member-department,
+.stat-label,
+.section-heading p {
+  color: #bcaed3 !important;
+}
+
+.skill-chip,
+.nav-count,
+.workspace-icon,
+.add-card-icon,
+.project-square {
+  background: #352449 !important;
+  color: #dcc8ff !important;
+  border-color: #513a69 !important;
+}
+
+.member-card-bottom,
+.founder,
+.profile-tabs,
+.form-footer {
+  border-color: #44335b !important;
+}
+
+.profile-hero {
+  background: radial-gradient(
+    ellipse at top,
+    #372151,
+    #171226 75%
+  ) !important;
+}
+
+.button-secondary,
+.export-button {
+  background: #302243 !important;
+  color: #e7d9ff !important;
+  border-color: #513a6b !important;
+}
+
+.member-form input,
+.member-form select,
+.member-form textarea,
+.search-field input,
+.department-filter select {
+  background: #171226 !important;
+  color: #f4efff !important;
+  border-color: #49385f !important;
+}
+
+.member-status.ready {
+  color: #8de6bc !important;
+  background: #19372d !important;
+  border-color: #28594c !important;
+}
+
+.member-status.paused {
+  color: #f4c57e !important;
+  background: #382b20 !important;
+  border-color: #695033 !important;
+}
+
+/* ECE SAYFASI */
+
+.ece-page {
+  background: radial-gradient(
+    ellipse at top,
+    #231538,
+    #0b0914 70%
+  ) !important;
+
+  color: #f4efff !important;
+}
+
+.ece-page > div {
+  background: #171226 !important;
+  border-color: #392c50 !important;
+  box-shadow: 0 22px 70px #05030c99 !important;
+}
+
+.ece-page header,
+.ece-page form {
+  border-color: #392c50 !important;
+}
+
+.ece-page header a {
+  color: #c8adff !important;
+}
+
+.ece-page h1,
+.ece-page h2,
+.ece-page strong {
+  color: #f4efff !important;
+}
+
+.ece-page p,
+.ece-page small {
+  color: #c7b9dc;
+}
+
+.ece-page header > div > div:first-child {
+  background: #392450 !important;
+  color: #e0ccff !important;
+}
+
+/* ECE İÇİNDEKİ KARTLAR */
+
+.ece-page > div div[style*="background"] {
+  background: #211933 !important;
+  border-color: #44335b !important;
+}
+
+.ece-page .ece-bubble-user {
+  background: #53357e !important;
+  color: #ffffff !important;
+}
+
+.ece-page .ece-bubble-assistant {
+  background: #261c39 !important;
+  color: #eee8fa !important;
+}
+
+/* İŞ PLANI VE KAYITLI PLANLAR */
+
+.ece-page [aria-label="Kayıtlı iş planları"],
+.ece-page [aria-label="İş planı kalite kontrolü"] {
+  background: #211933 !important;
+  border-color: #49365d !important;
+  color: #eee8fa !important;
+}
+
+.ece-page [aria-label="Kayıtlı iş planları"] > div > div {
+  background: #291f3d !important;
+  border-color: #49365d !important;
+}
+
+/* FORM ALANLARI VE BUTONLAR */
+
+.ece-page textarea,
+.ece-page input,
+.ece-page select {
+  background: #151021 !important;
+  color: #f4efff !important;
+  border: 1px solid #513a6b !important;
+}
+
+.ece-page textarea::placeholder,
+.ece-page input::placeholder {
+  color: #a091b9 !important;
+}
+
+.ece-page select option {
+  background: #211933;
+  color: #f4efff;
+}
+
+.ece-page button {
+  background: #342449 !important;
+  color: #e9ddff !important;
+  border-color: #60477b !important;
+}
+
+.ece-page button:hover:not(:disabled) {
+  filter: brightness(1.17);
+}
+
+.ece-page form button[type="submit"] {
+  background: #8050e2 !important;
+  color: #ffffff !important;
+}
+
+.ece-page button:disabled {
+  opacity: 0.48 !important;
+}
+
+/* ==========================================
+   KARAR MERKEZİ
+   ========================================== */
+
+/* Hem sınıflı hem mevcut eski details yapısını destekler */
+
+.ece-page .decision-center,
+.ece-page > div > details {
+  background: #171226 !important;
+  color: #f4efff !important;
+  border-color: #392c50 !important;
+}
+
+.ece-page .decision-center > summary,
+.ece-page > div > details > summary {
+  color: #d8c3ff !important;
+  font-weight: 700;
+}
+
+.ece-page .decision-card,
+.ece-page > div > details > div > div > div {
+  background: #211933 !important;
+  border: 1px solid #49365d !important;
+  border-radius: 14px !important;
+  color: #eee8fa !important;
+  box-shadow: 0 4px 18px #05030c33;
+}
+
+.ece-page .decision-card strong,
+.ece-page > div > details > div > div > div > strong {
+  color: #f4efff !important;
+}
+
+.ece-page .decision-card p,
+.ece-page > div > details > div > div > div > p {
+  color: #c9b9e2 !important;
+}
+
+.ece-page .decision-card small,
+.ece-page > div > details > div > div > div > small {
+  color: #d3b9ef !important;
+}
+
+.ece-page .decision-center > div > button,
+.ece-page > div > details > div > button {
+  background: #342449 !important;
+  color: #e9ddff !important;
+  border: 1px solid #60477b !important;
+}
+
+.ece-page .decision-card:hover {
+  border-color: #9269c7 !important;
+}
+
+/* KAYDIRMA ÇUBUKLARI */
+
+.ece-page,
+.sidebar,
+.workspace-dialog {
+  scrollbar-color: #584078 #171226;
+  scrollbar-width: thin;
+}
+
+::-webkit-scrollbar {
+  width: 9px;
+}
+
+::-webkit-scrollbar-track {
+  background: #171226;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #584078;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #8050e2;
+}

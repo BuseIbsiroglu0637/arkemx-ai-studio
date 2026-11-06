@@ -433,7 +433,7 @@ export default function EcePage() {
         }
     }
     const busy = loading || planning || historyLoading || checking || saving || plansLoading || openingPlan;
-    return (<main style={{
+    return (<main className="ece-page" style={{
             minHeight: "100vh",
             background: "#f3f5f1",
             padding: "24px 12px",
@@ -618,7 +618,12 @@ export default function EcePage() {
 
             </div>)}
 
-          {messages.map((item, index) => (<div key={index} style={{
+          {messages.map((item, index) => (<div key={index}
+          className={
+            item.role === "user"
+                ? "ece-bubble-user"
+                : "ece-bubble-assistant"
+            } style={{
                 alignSelf: item.role === "user" ? "flex-end" : "flex-start",
                 maxWidth: "85%",
                 padding: "14px 18px",
