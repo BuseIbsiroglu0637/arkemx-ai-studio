@@ -1000,3 +1000,129 @@ select {
     flex: 0 0 auto !important;
   }
 }
+
+/* ============================================================
+   ECE YONETICI OFISI v1.9 - UST YONETIM MENUSU
+   Avatar is on the left, the selected panel is on the right.
+   ============================================================ */
+.ece-page .ece-office-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #44335b;
+}
+.ece-page .ece-office-nav button {
+  padding: 9px 15px !important;
+  border: 1px solid #59416f !important;
+  border-radius: 11px !important;
+  background: #261a38 !important;
+  color: #cdbce7 !important;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 140ms ease;
+}
+.ece-page .ece-office-nav button[aria-pressed="true"] {
+  background: #6943b8 !important;
+  color: #fff !important;
+  border-color: #a17aef !important;
+}
+.ece-page .ece-office-nav button:focus-visible {
+  outline: 2px solid #d5b9ff !important;
+  outline-offset: 2px;
+}
+.ece-page .ece-office-panel {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #171226;
+  color: #f4efff;
+  border: 1px solid #392c50;
+  border-radius: 15px;
+}
+.ece-page .ece-office-panel-heading {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid #44335b;
+}
+.ece-page .ece-office-panel-heading h2 {
+  margin: 0 0 5px !important;
+  font-size: 21px;
+}
+.ece-page .ece-office-panel-heading p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.ece-page .ece-office-panel-heading button {
+  border: 1px solid #7955a3 !important;
+  border-radius: 10px !important;
+  padding: 9px 14px !important;
+  cursor: pointer;
+}
+.ece-page .ece-office-panel-scroll {
+  flex: 1 1 0%;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  padding: 18px;
+  scrollbar-gutter: stable;
+}
+.ece-page .ece-office-plans {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+}
+.ece-page .ece-office-plans > .ece-office-saved {
+  padding: 0 !important;
+  border-bottom: 0 !important;
+}
+.ece-page .ece-office-plans > .ece-office-saved > section {
+  max-height: none !important;
+  overflow: visible !important;
+}
+.ece-page .ece-office-panel .decision-center {
+  max-height: none !important;
+  overflow: visible !important;
+}
+@media (min-width: 960px) and (min-height: 620px) {
+  .ece-page > .ece-office-shell > .ece-office-panel {
+    grid-column: 2 !important;
+    grid-row: 2 !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+  }
+  /* Removed the controls below the avatar: give the VRM the whole left column. */
+  .ece-page .ece-office-left > .ece-avatar-stage {
+    flex: 1 1 0% !important;
+  }
+}
+@media (max-width: 959px), (max-height: 619px) {
+  .ece-page .ece-office-panel {
+    height: min(65dvh, 700px);
+    min-height: 350px;
+    max-height: none;
+  }
+  .ece-page .ece-office-panel-scroll {
+    min-height: 0;
+    overflow-y: auto;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ece-page .ece-office-nav button { transition: none; }
+}

@@ -1,0 +1,9 @@
+.ece-page .ece-voice-input { margin-bottom: 12px; padding: 13px; border: 1px solid #66517d; border-radius: 12px; background: #2a1d3b; color: #eee2fb; }
+.ece-page .ece-voice-buttons { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.ece-page .ece-voice-buttons button { padding: 10px 13px; border-radius: 9px; border: 1px solid #a17dc7; background: #72519c; color: #fff; font: inherit; cursor: pointer; }
+.ece-page .ece-voice-buttons button:disabled { opacity: .5; cursor: default; }
+.ece-page .ece-voice-buttons button:focus-visible { outline: 2px solid #ead3ff; outline-offset: 3px; }
+.ece-page .ece-voice-input p, .ece-page .ece-voice-buttons span { font-size: 12px; line-height: 1.6; margin: 8px 0 0; }
+.ece-page .ece-voice-input p { color: #d5c4e8; }
+.ece-page .ece-voice-input [role=alert] { color: #ffd2d2; }
+.ece-page .ece-voice-transcript { overflow-wrap: anywhere; }

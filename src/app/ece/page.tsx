@@ -6,6 +6,7 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 
 import DecisionCenter from "./decision-center";
 import EceAvatar from "./ece-avatar";
+import VoiceInput from "./voice-input";
 
 import type { WorkPlanDraft } from "@/domain/work-plan";
 
@@ -153,6 +154,8 @@ export default function EcePage() {
     const [plansLoading, setPlansLoading] = useState(false);
 
     const [openingPlan, setOpeningPlan] = useState(false);
+    const [listening, setListening] = useState(false);
+    const chatRequestInFlight = useRef(false);
     const [speaking, setSpeaking] = useState(false);
     const [voiceLoading, setVoiceLoading] = useState(false);
     const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -336,7 +339,9 @@ export default function EcePage() {
         } catch (failure) {
             if (!controller.signal.aborted) {
                 stopEceVoice();
-                setError(failure instanceof Error ? failure.message : "Ses üretilemedi.");
+                setError(failure instanceof Error && failure.name === "NotAllowedError"
+                    ? "Tarayıcı otomatik sesi engelledi. Yanıtın yanındaki seslendirme düğmesine basabilirsin."
+                    : failure instanceof Error ? failure.message : "Ses üretilemedi.");
             }
         } finally {
             if (voiceRequestRef.current === controller) {
@@ -347,15 +352,20 @@ export default function EcePage() {
     }
 
     async function sendMessage(event: FormEvent<HTMLFormElement>) {
-
         event.preventDefault();
+        if (listening) return;
+        await submitChat(input, false);
+    }
 
-        const text = input.trim();
+    async function submitChat(message: string, speakReply: boolean) {
+        const text = message.trim();
 
-        if (!text || loading || planning || historyLoading || checking || saving || plansLoading || openingPlan)
+        if (!text || chatRequestInFlight.current || loading || planning || historyLoading || checking || saving || plansLoading || openingPlan)
 
             return;
 
+        chatRequestInFlight.current = true;
+        stopEceVoice();
         setMessages((previous) => [
 
             ...previous,
@@ -403,6 +413,7 @@ export default function EcePage() {
                 { role: "assistant", content: result.data.reply },
 
             ]);
+            if (speakReply) await speakEce(result.data.reply);
 
         }
 
@@ -419,6 +430,7 @@ export default function EcePage() {
 
         finally {
 
+            chatRequestInFlight.current = false;
             setLoading(false);
 
         }
@@ -951,7 +963,7 @@ export default function EcePage() {
 
     }
 
-    const busy = loading || planning || historyLoading || checking || saving || plansLoading || openingPlan;
+    const busy = listening || loading || planning || historyLoading || checking || saving || plansLoading || openingPlan;
 
     return (<main className="ece-page" style={{
 
@@ -1761,7 +1773,14 @@ export default function EcePage() {
 
         }}>
 
-          <textarea value={input} onChange={(event) => setInput(event.target.value)} placeholder="Ece'ye mesaj veya iş planı hedefi yaz..." maxLength={2000} rows={3} style={{
+          <VoiceInput
+            disabled={loading || planning || historyLoading || checking || saving || plansLoading || openingPlan}
+            hasDraft={Boolean(input.trim())}
+            onStart={stopEceVoice}
+            onActiveChange={setListening}
+            onSubmit={text => { void submitChat(text, true); }}
+          />
+          <textarea aria-label="Ece'ye mesajın" disabled={listening} value={input} onChange={(event) => setInput(event.target.value)} placeholder="Ece'ye mesaj veya iş planı hedefi yaz..." maxLength={2000} rows={3} style={{
 
             display: "block",
 

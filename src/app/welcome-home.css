@@ -1,0 +1,94 @@
+/* ARKEMX – Ece ile karşılama ekranı v2.0. Sadece / ana sayfasını etkiler. */
+.arkemx-home {
+  --welcome-text: #f5eeff;
+  --welcome-muted: #beafd5;
+  min-height: 100dvh;
+  padding: clamp(16px, 2.2vw, 32px);
+  color: var(--welcome-text);
+  background: radial-gradient(ellipse at 23% 19%, #291844 0%, transparent 47%),
+              radial-gradient(ellipse at 93% 8%, #1b1230 0%, transparent 52%), #0b0914;
+}
+.arkemx-home *, .arkemx-home *::before, .arkemx-home *::after { box-sizing: border-box; }
+.arkemx-home-inner { max-width: 1450px; margin: 0 auto; }
+.arkemx-home-topbar { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 6px 0 25px; }
+.arkemx-home-brand { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; color: #fff; }
+.arkemx-home-mark { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 13px; background: linear-gradient(145deg,#9572ed,#6440c0); font-size: 29px; box-shadow: 0 6px 25px #4b287a55; }
+.arkemx-home-brand strong { display: block; font-size: 17px; letter-spacing: .11em; line-height: 1.2; }
+.arkemx-home-brand small { display: block; margin-top: 3px; font-size: 10px; color: #bca9d8; letter-spacing: .2em; }
+.arkemx-home-topnav { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+.arkemx-home-topnav a { text-decoration: none; color: #d7c8ed; font-size: 13px; padding: 10px 15px; border-radius: 12px; border: 1px solid #49365e; background: #1c152a; }
+.arkemx-home-topnav a:hover { color: #fff; background: #35234a; }
+.arkemx-home-hero { display: grid; grid-template-columns: minmax(310px, .91fr) minmax(0,1.09fr); gap: clamp(20px, 3vw, 48px); align-items: stretch; min-height: 520px; padding: clamp(14px, 2vw, 24px); border: 1px solid #4b365f; border-radius: 24px; background: linear-gradient(117deg, #20142e 0%, #191225 57%, #15101f 100%); box-shadow: 0 23px 90px #05030ba3; }
+.arkemx-home-avatar-wrap { position: relative; isolation: isolate; min-width: 0; min-height: 470px; height: 100%; display: flex; border: 1px solid #543a70; border-radius: 20px; background: radial-gradient(ellipse at 50% 35%, #523974 0%, #302043 50%, #1d142c 100%); overflow: hidden; }
+.arkemx-home-orbit { position: absolute; z-index: -1; width: 70%; aspect-ratio: 1; left: 15%; top: 12%; border-radius: 50%; border: 1px solid #a47cce2c; box-shadow: 0 0 110px #b47cff25; }
+/* Ece Avatar'ın mevcut /ece CSS'ini değiştirmeden ana ekranda boyutlandır. */
+.arkemx-home-avatar-wrap .ece-avatar-stage { flex: 1; display: flex; min-width: 0; min-height: 0; margin: 0; padding: 0; background: transparent; }
+.arkemx-home-avatar-wrap .ece-avatar-viewport { flex: 1; min-width: 0; min-height: 0; width: 100%; height: 100%; position: relative; overflow: hidden; }
+.arkemx-home-avatar-wrap .ece-avatar-canvas { display: block; width: 100%; height: 100%; }
+.arkemx-home-avatar-caption { position: absolute; z-index: 2; left: 14px; right: 14px; bottom: 14px; display: flex; gap: 12px; align-items: center; padding: 13px 16px; background: #191025df; backdrop-filter: blur(14px); border-radius: 14px; border: 1px solid #7a5e9d66; }
+.arkemx-home-avatar-caption strong { display: block; font-size: 15px; color: #fff; }
+.arkemx-home-avatar-caption small { display: block; margin-top: 2px; font-size: 12px; color: #c4b2dd; }
+.arkemx-home-avatar-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; background: #c7a6fc; box-shadow: 0 0 12px #be9aff; }
+.arkemx-home-3d { margin-left: auto; padding: 5px 8px; border-radius: 6px; background: #39234f; font-size: 10px; color: #d7c0fc; letter-spacing: .1em; }
+.arkemx-home-hero-text { display: flex; flex-direction: column; justify-content: center; min-width: 0; padding: clamp(10px, 2vw, 27px) clamp(4px, 1vw, 14px); }
+.arkemx-home-eyebrow { color: #b89be8; letter-spacing: .18em; font-weight: 750; font-size: 11px; }
+.arkemx-home-hero-text h1 { margin: 21px 0 22px; font-size: clamp(38px, 4.3vw, 67px); line-height: 1.1; letter-spacing: -.045em; color: #f7f0ff; font-weight: 780; }
+.arkemx-home-hero-text h1 em { color: #cbaaff; font-style: normal; }
+.arkemx-home-hero-text h1 span { font-size: .65em; }
+.arkemx-home-hero-text p { max-width: 590px; color: #e0d4ef; line-height: 1.7; font-size: clamp(15px,1.15vw,18px); margin: 0 0 12px; }
+.arkemx-home-hero-text p.arkemx-home-secondary { color: #bbaace; font-size: 14px; }
+.arkemx-home-actions { display: flex; align-items: center; gap: 11px; flex-wrap: wrap; margin-top: 20px; }
+.arkemx-home-primary { display: inline-flex; align-items: center; justify-content: center; gap: 15px; padding: 15px 19px; border-radius: 12px; text-decoration: none; background: linear-gradient(110deg,#9769e9,#734ac9); box-shadow: 0 12px 28px #6d3cba35; color: #fff; font-size: 14px; font-weight: 700; }
+.arkemx-home-primary:hover { filter: brightness(1.12); }
+.arkemx-home-secondary-button { padding: 14px 16px; border: 1px solid #604879; border-radius: 12px; background: #30213e; color: #e1cff9; font: inherit; font-size: 13px; cursor: pointer; }
+.arkemx-home-secondary-button:hover { background: #463057; }
+.arkemx-home-voice-controls { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 19px; }
+.arkemx-home-voice-controls button { border: 0; background: none; color: #d9baff; padding: 5px 0; cursor: pointer; font: inherit; font-size: 13px; text-align: left; }
+.arkemx-home-voice-controls button:hover { color: #fff; }
+.arkemx-home-voice-controls span { color: #8f7caa; font-size: 11px; }
+.arkemx-home-hero-text p.arkemx-home-error { margin-top: 8px; color: #ffb8ba; font-size: 12px; }
+.arkemx-home-workspaces { margin-top: 25px; }
+.arkemx-home-sectionheading { display: flex; align-items: baseline; flex-wrap: wrap; justify-content: space-between; gap: 12px; margin-bottom: 15px; }
+.arkemx-home-sectionheading h2 { margin: 0; color: #f4eaff; font-size: 19px; }
+.arkemx-home-sectionheading p { margin: 0; color: #a894c1; font-size: 12px; }
+.arkemx-home-cards { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 14px; }
+.arkemx-home-card { position: relative; display: flex; flex-direction: column; gap: 7px; min-height: 133px; padding: 17px 20px; text-decoration: none; background: #1c1428; border: 1px solid #403053; border-radius: 16px; transition: transform .18s, background .18s, border-color .18s; }
+.arkemx-home-card:hover { transform: translateY(-2px); background: #291b3a; border-color: #7f5ca7; }
+.arkemx-home-card-icon { color: #c09cfb; font-size: 25px; line-height: 1; }
+.arkemx-home-card strong { margin-top: 3px; color: #f5edff; font-size: 14px; }
+.arkemx-home-card > span:nth-of-type(2) { max-width: 260px; color: #b1a2c8; font-size: 12px; }
+.arkemx-home-card-arrow { position: absolute; right: 17px; top: 17px; color: #bba0e9; font-size: 16px; }
+.arkemx-home-footer { display: flex; justify-content: center; gap: 8px; padding: 23px 8px 9px; color: #89789f; font-size: 10px; letter-spacing: .1em; }
+@media (max-width: 930px) {
+  .arkemx-home-hero { grid-template-columns: 1fr; }
+  .arkemx-home-avatar-wrap { height: 450px; min-height: 450px; }
+  .arkemx-home-hero-text { padding: 12px; }
+  .arkemx-home-hero-text h1 { margin: 10px 0 15px; font-size: clamp(34px,7vw,52px); }
+}
+@media (max-width: 600px) {
+  .arkemx-home { padding: 12px; }
+  .arkemx-home-topbar { align-items: flex-start; }
+  .arkemx-home-topnav { justify-content: flex-end; }
+  .arkemx-home-topnav a { font-size: 11px; padding: 9px 10px; }
+  .arkemx-home-hero { border-radius: 17px; padding: 10px; }
+  .arkemx-home-avatar-wrap { height: 375px; min-height: 375px; }
+  .arkemx-home-hero-text { padding: 14px 6px 20px; }
+  .arkemx-home-cards { grid-template-columns: 1fr; }
+  .arkemx-home-card { min-height: 105px; }
+  .arkemx-home-brand strong { font-size: 13px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .arkemx-home-card { transition: none; }
+  .arkemx-home-card:hover { transform: none; }
+}
+
+/* Office composition: more room for the desk and seated silhouette. */
+.arkemx-home-hero { grid-template-columns: minmax(350px,1.12fr) minmax(0,1fr); }
+.arkemx-home-avatar-wrap { min-height: 520px; background: #34313e; }
+.arkemx-home-avatar-caption { left: 12px; right: auto; bottom: 12px; padding: 9px 13px; gap: 9px; background: #191025d9; }
+.arkemx-home-3d { display: none; }
+.arkemx-voice-choice { display: flex; align-items: center; gap: 8px; color: #beafd5; font-size: 12px; }
+.arkemx-voice-choice select { padding: 8px; border: 1px solid #604879; border-radius: 8px; background: #241a33; color: #f3eaff; font: inherit; }
+.arkemx-voice-choice select:focus-visible { outline: 2px solid #cbaaff; outline-offset: 3px; }
+@media (max-width: 930px) { .arkemx-home-hero { grid-template-columns: 1fr; } .arkemx-home-avatar-wrap { min-height: 450px; } }
+@media (max-width: 600px) { .arkemx-home-avatar-wrap { min-height: 375px; } }

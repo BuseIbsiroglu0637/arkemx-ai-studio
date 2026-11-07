@@ -69,3 +69,6 @@
   .ece-page .ece-avatar-viewport { height: 250px; }
   .ece-page .ece-avatar-welcome { padding-top: 0; }
 }
+
+.ece-avatar-stage { position: relative; }
+.ece-avatar-load-state { position: absolute; z-index: 3; left: 16px; right: 16px; top: 16px; margin: 0; padding: 10px 12px; border-radius: 8px; background: #211631ed; color: #f3eaff; font-size: 13px; }

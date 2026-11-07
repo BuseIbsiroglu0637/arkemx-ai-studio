@@ -74,3 +74,14 @@ tests/               Kalıcılık, erişim sınırları ve MCP kontrolleri
 ```
 
 Arayüz ve MCP aynı servisleri kullanır. Model bağlantısı ve iş deneyimi, profil düzenleme isteğiyle taklit edilemez. İleride her çalıştırma, çalışan kimliği ile kullanılan model/talimat sürümüne bağlanacaktır.
+
+
+## Ece ile sesli sohbet
+
+`/ece` sayfasında **Mikrofonla konuş** düğmesine basın ve tarayıcının mikrofon iznini verin. Türkçe konuşma tanıma tamamlanınca yalnızca kesinleşen metin mevcut sohbet API'sine gönderilir. Ece yanıtı metin olarak kaydeder ve Türkçe Emel sesiyle okur. Yeni konuşma için düğmeye yeniden basılır; mikrofon kendiliğinden yeniden açılmaz.
+
+**Dinlemeyi bitir ve gönder**, tanımanın son sonucunu bekler; **İptal**, konuşmayı göndermez. Sekme gizlendiğinde veya sayfadan çıkıldığında dinleme iptal edilir. Bir dinleme en fazla 60 saniye sürer. Yazılı taslak varken sesli giriş kapalıdır; mevcut taslak korunur.
+
+Tarayıcıda `SpeechRecognition` veya `webkitSpeechRecognition` desteği gerekir. Tanıma Türkçe (`tr-TR`) olarak yapılandırılmıştır. Destek bulunamazsa ekranda yazıyla devam seçeneği belirtilir. Bazı tarayıcılar sesi çevrimiçi tanıma servisine gönderir; bu özellik çevrimdışı ya da tamamen yerel tanıma garantisi vermez. Uygulama mikrofon ses dosyasını kendi sunucusuna kaydetmez; tanınan metin mevcut sohbet geçmişinin bir parçasıdır. [SpeechRecognition davranışı](https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition).
+
+Tarayıcı otomatik yanıt sesini engellerse mesajdaki **Yanıtı dinle** düğmesi kullanılabilir. Gerçek mikrofon kalitesi ve tanıma servisinin erişilebilirliği kullanıcının tarayıcısında ayrıca denenmelidir.

@@ -11,7 +11,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const execFileAsync = promisify(execFile);
-const VOICE = "tr-TR-EmelNeural";
+const VOICE = { name: "tr-TR-EmelNeural", rate: "+0%", pitch: "-2Hz" } as const;
 const MAX_TEXT_LENGTH = 2000;
 const MAX_AUDIO_SIZE = 6 * 1024 * 1024;
 
@@ -33,13 +33,17 @@ export async function POST(request: Request) {
       throw new StudioError(400, "Seslendirilecek metin 1–2000 karakter olmalı.");
     }
 
+    const requestedVoice = "voice" in body ? body.voice : "emel";
+    if (requestedVoice !== "emel") throw new StudioError(400, "Geçersiz ses seçimi.");
+    const voice = VOICE;
+
     // Rastgele geçici klasör: metin ve MP3 dosyaları iş bitince silinir.
     // Metni komut argümanına değil UTF-8 dosyasına yazıyoruz.
     const workingDir = await mkdtemp(join(tmpdir(), "arkemx-ece-voice-"));
     try {
       const inputFile = join(workingDir, "message.txt");
       const outputFile = join(workingDir, "ece.mp3");
-      await writeFile(inputFile, body.text.trim(), "utf8");
+      await writeFile(inputFile, body.text.trim().replace(/\bARKEMX\b/g, "Arkemeks").replace(/\bAI\b/g, "yapay zekâ"), "utf8");
 
       // Varsayılan Windows Python launcher: py.exe.
       // Farklı yorumlayıcı için ECE_TTS_PYTHON ortam değişkeni verilebilir.
@@ -49,10 +53,11 @@ export async function POST(request: Request) {
           python,
           [
             "-m", "edge_tts",
-            "--voice", VOICE,
+            "--voice", voice.name,
             "--file", inputFile,
             "--write-media", outputFile,
-            "--rate=-3%",
+            `--rate=${voice.rate}`,
+            `--pitch=${voice.pitch}`,
           ],
           { timeout: 60_000, maxBuffer: 256 * 1024, windowsHide: true }
         );
