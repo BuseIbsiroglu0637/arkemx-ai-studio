@@ -1,382 +1,1002 @@
+/* ==========================================*
 
-/* ==========================================
-   ARKEMX AI STUDIO — MIDNIGHT VIOLET
-   Global Dark Purple Theme
-   ========================================== */
+*   ARKEMX AI STUDIO — MIDNIGHT VIOLET*
+
+*   Global Dark Purple Theme*
+
+*   ========================================== */
+
+
 
 :root {
+
   color-scheme: dark;
 
+
+
   --canvas: #0b0914;
+
   --ink: #f4efff;
+
   --text: #eee8fa;
+
   --muted: #b8aacc;
+
   --border: #392c50;
 
+
+
   --green: #8050e2;
+
   --green-dark: #6a39c8;
+
   --green-soft: #2b1d43;
+
   --white: #171226;
 
+
+
   --purple-accent: #a780ff;
+
   --purple-soft: #d8c3ff;
+
   --purple-panel: #211933;
+
   --purple-surface: #171226;
+
 }
+
+
 
 /* GENEL SAYFA */
 
+
+
 html,
-body {
-  background: var(--canvas) !important;
-  color: var(--text);
-}
 
 body {
-  background-image: radial-gradient(
-    ellipse at 70% 0%,
-    #211335 0%,
-    #0b0914 65%
-  ) !important;
+
+  background: var(--canvas) !important;
+
+  color: var(--text);
+
 }
+
+
+
+body {
+
+  background-image: radial-gradient(
+
+    ellipse at 70% 0%,
+
+    #211335 0%,
+
+    #0b0914 65%
+
+  ) !important;
+
+}
+
+
 
 ::selection {
+
   background: #7450aa;
+
   color: white;
+
 }
+
+
 
 button:focus-visible,
+
 input:focus-visible,
+
 textarea:focus-visible,
+
 select:focus-visible {
+
   outline-color: #b79aff !important;
+
 }
 
+
+
 input,
+
 textarea,
+
 select {
+
   color-scheme: dark;
+
 }
+
+
 
 /* ANA EKİP EKRANI */
 
+
+
 .sidebar,
+
 .topbar,
+
 .workspace-dialog {
+
   background: #171226 !important;
+
   border-color: #392c50 !important;
+
   color: #f4efff !important;
+
 }
+
+
 
 .topbar {
+
   background: #130f20 !important;
+
 }
+
+
 
 .workspace-switch,
+
 .sidebar-note,
+
 .welcome-banner,
+
 .team-stats,
+
 .member-card,
+
 .search-field,
+
 .department-filter,
+
 .view-switch,
+
 .empty-results,
+
 .profile-project-panel,
+
 .cv-summary,
+
 .history-empty,
+
 .connection-explanation,
+
 .connection-empty,
+
 .toast {
+
   background: #211933 !important;
+
   color: #eee8fa !important;
+
   border-color: #44335b !important;
+
 }
+
+
 
 .welcome-banner {
+
   background: linear-gradient(
+
     120deg,
+
     #30194d,
+
     #1c142d 65%,
+
     #301a4b
+
   ) !important;
+
 }
+
+
 
 .studio-mark,
+
 .button-primary {
+
   background: #8050e2 !important;
+
   color: #ffffff !important;
+
 }
+
+
 
 .nav-item.active,
+
 .nav-item:hover:not(:disabled),
+
 .view-switch button.selected {
+
   background: #35224f !important;
+
   color: #decaff !important;
+
 }
+
+
 
 .page-heading h1,
+
 .section-heading h2,
+
 .member-main h3,
+
 .welcome-banner h2,
+
 .profile-hero h3,
+
 .dialog-heading h2,
+
 .brand strong {
+
   color: #f4efff !important;
+
 }
+
+
 
 .nav-item,
+
 .page-subtitle,
+
 .member-role,
+
 .member-description,
+
 .member-department,
+
 .stat-label,
+
 .section-heading p {
+
   color: #bcaed3 !important;
+
 }
+
+
 
 .skill-chip,
+
 .nav-count,
+
 .workspace-icon,
+
 .add-card-icon,
+
 .project-square {
+
   background: #352449 !important;
+
   color: #dcc8ff !important;
+
   border-color: #513a69 !important;
+
 }
+
+
 
 .member-card-bottom,
+
 .founder,
+
 .profile-tabs,
+
 .form-footer {
+
   border-color: #44335b !important;
+
 }
+
+
 
 .profile-hero {
+
   background: radial-gradient(
+
     ellipse at top,
+
     #372151,
+
     #171226 75%
+
   ) !important;
+
 }
+
+
 
 .button-secondary,
+
 .export-button {
+
   background: #302243 !important;
+
   color: #e7d9ff !important;
+
   border-color: #513a6b !important;
+
 }
+
+
 
 .member-form input,
+
 .member-form select,
+
 .member-form textarea,
+
 .search-field input,
+
 .department-filter select {
+
   background: #171226 !important;
+
   color: #f4efff !important;
+
   border-color: #49385f !important;
+
 }
+
+
 
 .member-status.ready {
+
   color: #8de6bc !important;
+
   background: #19372d !important;
+
   border-color: #28594c !important;
+
 }
 
+
+
 .member-status.paused {
+
   color: #f4c57e !important;
+
   background: #382b20 !important;
+
   border-color: #695033 !important;
+
 }
+
+
 
 /* ECE SAYFASI */
 
+
+
 .ece-page {
+
   background: radial-gradient(
+
     ellipse at top,
+
     #231538,
+
     #0b0914 70%
+
   ) !important;
 
+
+
   color: #f4efff !important;
+
 }
+
+
 
 .ece-page > div {
+
   background: #171226 !important;
+
   border-color: #392c50 !important;
+
   box-shadow: 0 22px 70px #05030c99 !important;
+
 }
+
+
 
 .ece-page header,
+
 .ece-page form {
+
   border-color: #392c50 !important;
+
 }
+
+
 
 .ece-page header a {
+
   color: #c8adff !important;
+
 }
+
+
 
 .ece-page h1,
+
 .ece-page h2,
+
 .ece-page strong {
+
   color: #f4efff !important;
+
 }
+
+
 
 .ece-page p,
+
 .ece-page small {
+
   color: #c7b9dc;
+
 }
 
+
+
 .ece-page header > div > div:first-child {
+
   background: #392450 !important;
+
   color: #e0ccff !important;
+
 }
+
+
 
 /* ECE İÇİNDEKİ KARTLAR */
 
-.ece-page > div div[style*="background"] {
+
+
+.ece-page > div div[style\*="background"] {
+
   background: #211933 !important;
+
   border-color: #44335b !important;
+
 }
+
+
 
 .ece-page .ece-bubble-user {
+
   background: #53357e !important;
+
   color: #ffffff !important;
+
 }
 
+
+
 .ece-page .ece-bubble-assistant {
+
   background: #261c39 !important;
+
   color: #eee8fa !important;
+
 }
+
+
 
 /* İŞ PLANI VE KAYITLI PLANLAR */
 
+
+
 .ece-page [aria-label="Kayıtlı iş planları"],
+
 .ece-page [aria-label="İş planı kalite kontrolü"] {
+
   background: #211933 !important;
+
   border-color: #49365d !important;
+
   color: #eee8fa !important;
+
 }
 
+
+
 .ece-page [aria-label="Kayıtlı iş planları"] > div > div {
+
   background: #291f3d !important;
+
   border-color: #49365d !important;
+
 }
+
+
 
 /* FORM ALANLARI VE BUTONLAR */
 
+
+
 .ece-page textarea,
+
 .ece-page input,
+
 .ece-page select {
+
   background: #151021 !important;
+
   color: #f4efff !important;
+
   border: 1px solid #513a6b !important;
+
 }
+
+
 
 .ece-page textarea::placeholder,
+
 .ece-page input::placeholder {
+
   color: #a091b9 !important;
+
 }
+
+
 
 .ece-page select option {
+
   background: #211933;
+
   color: #f4efff;
+
 }
+
+
 
 .ece-page button {
+
   background: #342449 !important;
+
   color: #e9ddff !important;
+
   border-color: #60477b !important;
+
 }
+
+
 
 .ece-page button:hover:not(:disabled) {
+
   filter: brightness(1.17);
+
 }
+
+
 
 .ece-page form button[type="submit"] {
+
   background: #8050e2 !important;
+
   color: #ffffff !important;
+
 }
+
+
 
 .ece-page button:disabled {
+
   opacity: 0.48 !important;
+
 }
 
-/* ==========================================
-   KARAR MERKEZİ
-   ========================================== */
+
+
+/* ==========================================*
+
+*   KARAR MERKEZİ*
+
+*   ========================================== */
+
+
 
 /* Hem sınıflı hem mevcut eski details yapısını destekler */
 
+
+
 .ece-page .decision-center,
+
 .ece-page > div > details {
+
   background: #171226 !important;
+
   color: #f4efff !important;
+
   border-color: #392c50 !important;
+
 }
+
+
 
 .ece-page .decision-center > summary,
+
 .ece-page > div > details > summary {
+
   color: #d8c3ff !important;
+
   font-weight: 700;
+
 }
+
+
 
 .ece-page .decision-card,
+
 .ece-page > div > details > div > div > div {
+
   background: #211933 !important;
+
   border: 1px solid #49365d !important;
+
   border-radius: 14px !important;
+
   color: #eee8fa !important;
+
   box-shadow: 0 4px 18px #05030c33;
+
 }
+
+
 
 .ece-page .decision-card strong,
+
 .ece-page > div > details > div > div > div > strong {
+
   color: #f4efff !important;
+
 }
+
+
 
 .ece-page .decision-card p,
+
 .ece-page > div > details > div > div > div > p {
+
   color: #c9b9e2 !important;
+
 }
+
+
 
 .ece-page .decision-card small,
+
 .ece-page > div > details > div > div > div > small {
+
   color: #d3b9ef !important;
+
 }
+
+
 
 .ece-page .decision-center > div > button,
+
 .ece-page > div > details > div > button {
+
   background: #342449 !important;
+
   color: #e9ddff !important;
+
   border: 1px solid #60477b !important;
+
 }
 
+
+
 .ece-page .decision-card:hover {
+
   border-color: #9269c7 !important;
+
 }
+
+
 
 /* KAYDIRMA ÇUBUKLARI */
 
+
+
 .ece-page,
+
 .sidebar,
+
 .workspace-dialog {
+
   scrollbar-color: #584078 #171226;
+
   scrollbar-width: thin;
+
 }
+
+
 
 ::-webkit-scrollbar {
+
   width: 9px;
+
 }
+
+
 
 ::-webkit-scrollbar-track {
+
   background: #171226;
+
 }
+
+
 
 ::-webkit-scrollbar-thumb {
+
   background: #584078;
+
   border-radius: 10px;
+
 }
 
+
+
 ::-webkit-scrollbar-thumb:hover {
+
   background: #8050e2;
+
+}
+
+/* ============================================================
+   ECE YONETICI OFISI v1.8 — ANIMASYONLU PROFIL / KAYAN SOHBET
+   Tek kaynak: sayfa ece-office-* siniflariyla uyumlu.
+   ============================================================ */
+
+@media (min-width: 960px) and (min-height: 620px) {
+  .ece-page {
+    display: block !important;
+    width: 100% !important;
+    height: 100dvh !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 10px !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
+
+  .ece-page > .ece-office-shell {
+    display: grid !important;
+    grid-template-columns: minmax(315px, 2fr) minmax(0, 3fr) !important;
+    grid-template-rows: auto minmax(0, 1fr) !important;
+    gap: 12px !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    max-width: 1600px !important;
+    min-height: 0 !important;
+    min-width: 0 !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Ust baslik tek satirda: 3D alana yer acilir. */
+  .ece-page > .ece-office-shell > .ece-office-header {
+    grid-column: 1 / -1 !important;
+    grid-row: 1 !important;
+    padding: 8px 18px !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+  }
+  .ece-page .ece-office-header > div {
+    margin-top: 4px !important;
+  }
+  .ece-page .ece-office-header h1 {
+    margin: 0 !important;
+  }
+  .ece-page .ece-office-header p {
+    margin-top: 3px !important;
+    margin-bottom: 3px !important;
+  }
+  .ece-page .ece-office-header [style*="width: 58px"] {
+    width: 48px !important;
+    height: 48px !important;
+  }
+
+  /* Sol kolon: karakter ve araclar ayni yerde kalir. */
+  .ece-page > .ece-office-shell > .ece-office-left {
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    border: 1px solid #392c50;
+    border-radius: 15px;
+    background: #211631;
+  }
+  .ece-page .ece-office-left > .ece-avatar-stage {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 1 0% !important;
+    width: 100% !important;
+    height: auto !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 8px 10px !important;
+    gap: 0 !important;
+    overflow: hidden !important;
+  }
+  .ece-page .ece-office-left .ece-avatar-viewport {
+    display: block !important;
+    flex: 1 1 0% !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 190px !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+  }
+  .ece-page .ece-office-left .ece-avatar-welcome {
+    flex: 0 0 auto !important;
+    padding: 4px 14px 8px !important;
+  }
+  .ece-page .ece-office-left .ece-avatar-welcome h2 {
+    font-size: clamp(18px, 2vw, 25px) !important;
+    margin: 4px 0 !important;
+  }
+  .ece-page .ece-office-left .ece-avatar-welcome p {
+    margin: 4px 0 !important;
+    font-size: 12px !important;
+    line-height: 1.45 !important;
+  }
+  .ece-page .ece-office-left .ece-avatar-state {
+    margin-top: 5px !important;
+  }
+  .ece-page .ece-office-left > .ece-office-tools {
+    flex: 0 0 auto !important;
+    width: 100%;
+    min-height: 0 !important;
+    max-height: min(16dvh, 130px) !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+    background: #171226;
+    border-top: 1px solid #49375f;
+  }
+  .ece-page .ece-office-saved {
+    padding: 7px 12px !important;
+  }
+
+  /* Sag kolon: sadece mesaj listesi kayar, yazma alani sabit. */
+  .ece-page > .ece-office-shell > .ece-office-chat {
+    grid-column: 2 !important;
+    grid-row: 2 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    min-height: 0 !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+    border: 1px solid #392c50;
+    border-radius: 15px;
+    background: #171226;
+  }
+  .ece-page .ece-office-chat > .ece-office-history {
+    flex: 1 1 0% !important;
+    height: auto !important;
+    max-height: none !important;
+    min-height: 0 !important;
+    min-width: 0 !important;
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 14px !important;
+    padding: 18px !important;
+    box-sizing: border-box;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+  }
+  .ece-page .ece-office-chat > p[role="alert"] {
+    flex: 0 0 auto !important;
+    padding: 6px 16px !important;
+    margin: 0 !important;
+  }
+  .ece-page .ece-office-chat > form {
+    flex: 0 0 auto !important;
+    min-height: 0 !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 10px 16px !important;
+    border-top: 1px solid #392c50 !important;
+    background: #171226 !important;
+  }
+  .ece-page .ece-office-chat > form textarea {
+    min-height: 52px !important;
+    max-height: 18dvh !important;
+  }
+  .ece-page .ece-office-chat > form p {
+    margin-top: 6px !important;
+    font-size: 11px !important;
+  }
+}
+
+/* Kucuk ekran veya kisa pencere: icerik kirpilmasin. */
+@media (max-width: 959px), (max-height: 619px) {
+  .ece-page {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 100dvh !important;
+    overflow: visible !important;
+    padding: 10px !important;
+    box-sizing: border-box;
+  }
+  .ece-page > .ece-office-shell {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    max-width: 900px !important;
+    height: auto !important;
+    max-height: none !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    gap: 12px !important;
+  }
+  .ece-page .ece-office-left,
+  .ece-page .ece-office-chat {
+    display: flex !important;
+    flex-direction: column !important;
+    position: static !important;
+    width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+  }
+  .ece-page .ece-office-left .ece-avatar-stage {
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+  }
+  .ece-page .ece-office-left .ece-avatar-viewport {
+    width: 100% !important;
+    height: min(46dvh, 390px) !important;
+    min-height: 210px !important;
+  }
+  .ece-page .ece-office-tools {
+    max-height: 220px;
+    overflow-y: auto;
+  }
+  .ece-page .ece-office-chat .ece-office-history {
+    display: flex !important;
+    flex-direction: column !important;
+    height: min(54dvh, 540px) !important;
+    max-height: none !important;
+    min-height: 270px !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+  }
+  .ece-page .ece-office-chat > form {
+    flex: 0 0 auto !important;
+  }
 }
