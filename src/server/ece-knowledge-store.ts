@@ -259,3 +259,72 @@ export function searchEceKnowledge(
 
   return rows as EceKnowledge[];
 }
+
+export function archiveEceKnowledge(id: string): boolean {
+  if (!id.trim() || id.length > 64) {
+    return false;
+  }
+
+  const db = getKnowledgeDatabase();
+
+  const result = db.prepare(`
+    UPDATE ece_knowledge
+    SET status = 'archived',
+        updated_at = ?
+    WHERE id = ?
+      AND status = 'saved'
+  `).run(new Date().toISOString(), id);
+
+  return result.changes === 1;
+}
+
+export function restoreEceKnowledge(id: string): boolean {
+  if (!id.trim() || id.length > 64) {
+    return false;
+  }
+
+  const db = getKnowledgeDatabase();
+
+  const result = db.prepare(`
+    UPDATE OR IGNORE ece_knowledge
+    SET status = 'saved',
+        updated_at = ?
+    WHERE id = ?
+      AND status = 'archived'
+  `).run(new Date().toISOString(), id);
+
+  return result.changes === 1;
+}
+
+export function updateEceKnowledge(
+  id: string,
+  newContent: string
+): boolean {
+  const content = newContent.trim();
+
+  if (
+    !id.trim() ||
+    id.length > 64 ||
+    !content ||
+    content.length > 5000
+  ) {
+    return false;
+  }
+
+  const db = getKnowledgeDatabase();
+
+  const result = db.prepare(`
+    UPDATE OR IGNORE ece_knowledge
+    SET
+      content = ?,
+      updated_at = ?
+    WHERE id = ?
+      AND status = 'saved'
+  `).run(
+    content,
+    new Date().toISOString(),
+    id
+  );
+
+  return result.changes === 1;
+}

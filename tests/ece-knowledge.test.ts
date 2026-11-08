@@ -5,11 +5,14 @@ import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { DatabaseSync } from "node:sqlite";
+import { updateEceKnowledge } from "../src/server/ece-knowledge-store";
 import {
   getKnowledgeDatabase,
   saveEceKnowledge,
   listEceKnowledge,
   searchEceKnowledge,
+  archiveEceKnowledge,
+  restoreEceKnowledge,
 } from "../src/server/ece-knowledge-store";
 
 test("Ece bir fikri kalıcı hafızaya kaydeder", () => {
@@ -121,4 +124,74 @@ test("Ece bir fikri kalıcı hafızaya kaydeder", () => {
   } finally {
     secondDb.close();
   }
+
+  // Kaydedilmiş bilgiyi arşivle.
+  const archived = archiveEceKnowledge(saved.id);
+
+  assert.equal(archived, true);
+
+  // Arşivlenen bilgi normal hafızada görünmemeli.
+  assert.equal(listEceKnowledge().length, 0);
+  assert.equal(searchEceKnowledge("emlak").length, 0);
+
+  // Ama veritabanından silinmemiş olmalı.
+  const archivedRow = getKnowledgeDatabase()
+    .prepare(`
+      SELECT status
+      FROM ece_knowledge
+      WHERE id = ?
+    `)
+    .get(saved.id) as { status: string };
+
+  assert.equal(archivedRow.status, "archived");
+
+  // Aynı kayıt ikinci kez arşivlenememeli.
+  assert.equal(archiveEceKnowledge(saved.id), false);
+
+  // Arşivlenen bilgiyi geri yükle.
+  const restored = restoreEceKnowledge(saved.id);
+
+  assert.equal(restored, true);
+
+  // Bilgi yeniden aktif hafızada görünmeli.
+  const memoriesAfterRestore = listEceKnowledge();
+
+  assert.equal(memoriesAfterRestore.length, 1);
+  assert.equal(memoriesAfterRestore[0].id, saved.id);
+
+  // Arama yeniden bu bilgiyi bulabilmeli.
+  const resultsAfterRestore = searchEceKnowledge("emlak");
+
+  assert.equal(resultsAfterRestore.length, 1);
+
+  // Zaten aktif olan kayıt tekrar geri yüklenmemeli.
+  assert.equal(restoreEceKnowledge(saved.id), false);
+
+
+  // Hafızadaki mevcut bilgiyi güncelle.
+  const newContent =
+    "Sanal emlak ofisine sesli AI asistanı eklenecek.";
+
+  const updated = updateEceKnowledge(
+    saved.id,
+    newContent
+  );
+
+  assert.equal(updated, true);
+
+  // Kayıt kimliği değişmeden içerik güncellenmeli.
+  const updatedMemory = listEceKnowledge();
+
+  assert.equal(updatedMemory.length, 1);
+  assert.equal(updatedMemory[0].id, saved.id);
+  assert.equal(updatedMemory[0].content, newContent);
+
+  // Yeni bilgi aranabilir olmalı.
+  assert.equal(searchEceKnowledge("sesli").length, 1);
+
+  // Eski içerik artık bulunmamalı.
+  assert.equal(
+    searchEceKnowledge("geliştirme fikri").length,
+    0
+  );
 });
