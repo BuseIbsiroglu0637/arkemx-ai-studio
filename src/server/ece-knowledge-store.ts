@@ -328,3 +328,43 @@ export function updateEceKnowledge(
 
   return result.changes === 1;
 }
+
+export function findSavedEceKnowledgeByTitle(
+  title: string
+): Pick<EceKnowledge, "id" | "title">[] {
+  const value = title.trim();
+
+  if (!value || value.length > 150) {
+    return [];
+  }
+
+  const rows = getKnowledgeDatabase().prepare(`
+    SELECT id, title
+    FROM ece_knowledge
+    WHERE status = 'saved'
+      AND title = ?
+    LIMIT 2
+  `).all(value);
+
+  return rows as Pick<EceKnowledge, "id" | "title">[];
+}
+
+export function findArchivedEceKnowledgeByTitle(
+  title: string
+): Pick<EceKnowledge, "id" | "title">[] {
+  const value = title.trim();
+
+  if (!value || value.length > 150) {
+    return [];
+  }
+
+  const rows = getKnowledgeDatabase().prepare(`
+    SELECT id, title
+    FROM ece_knowledge
+    WHERE status = 'archived'
+      AND title = ?
+    LIMIT 2
+  `).all(value);
+
+  return rows as Pick<EceKnowledge, "id" | "title">[];
+}

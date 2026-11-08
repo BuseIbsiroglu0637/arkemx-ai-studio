@@ -10,10 +10,21 @@ import { callEceMcpTool } from "@/server/ece-mcp";
 import { getEceProjectContext } from "@/server/ece-project-context";
 import { getEceDecisionContext } from "@/server/ece-decision-context";
 import { getEceKnowledgeContext } from "@/server/ece-knowledge-context";
-import { parseMemorySaveCommand } from "@/domain/knowledge-command";
-import { saveEceKnowledge } from "@/server/ece-knowledge-store";
+import {
+  parseMemorySaveCommand,
+  parseMemoryArchiveCommand,
+  parseMemoryRestoreCommand,
+  parseMemoryUpdateCommand,
+} from "@/domain/knowledge-command";
 
-
+import {
+  saveEceKnowledge,
+  findSavedEceKnowledgeByTitle,
+  archiveEceKnowledge,
+  findArchivedEceKnowledgeByTitle,
+  restoreEceKnowledge,
+  updateEceKnowledge,
+} from "@/server/ece-knowledge-store";
 
 type OllamaResponse = {
   message?: { content?: string };
@@ -184,6 +195,103 @@ export async function chatWithEce(userMessage: string): Promise<string> {
     ].join("\n");
   }
 
+  const archiveTitle = parseMemoryArchiveCommand(userMessage);
+
+  if (archiveTitle !== null) {
+    const matches = findSavedEceKnowledgeByTitle(archiveTitle);
+
+    if (matches.length === 0) {
+      return `Hafızamda "${archiveTitle}" başlıklı aktif kayıt bulamadım.`;
+    }
+
+    if (matches.length > 1) {
+      return (
+        `"${archiveTitle}" başlığıyla birden fazla aktif kayıt var. ` +
+        "Yanlış bilgiyi arşivlememek için hiçbir işlem yapmadım. " +
+        "Kayıt kimliğiyle seçim yapılması gerekiyor."
+      );
+    }
+
+    const archived = archiveEceKnowledge(matches[0].id);
+
+    if (!archived) {
+      return "Kayıt arşivlenemedi. Durumu değişmiş olabilir.";
+    }
+
+    return `**${matches[0].title}** kaydını arşivledim. 🗂️`;
+  }
+
+  const restoreTitle = parseMemoryRestoreCommand(userMessage);
+
+  if (restoreTitle !== null) {
+    const matches = findArchivedEceKnowledgeByTitle(restoreTitle);
+
+    if (matches.length === 0) {
+      return `"${restoreTitle}" başlıklı arşivlenmiş kayıt bulamadım.`;
+    }
+
+    if (matches.length > 1) {
+      return (
+        `"${restoreTitle}" başlığıyla birden fazla arşivlenmiş kayıt var. ` +
+        "Yanlış bilgiyi geri yüklememek için işlem yapmadım."
+      );
+    }
+
+    const restored = restoreEceKnowledge(matches[0].id);
+
+    if (!restored) {
+      return (
+        "Kayıt geri yüklenemedi. " +
+        "Durumu değişmiş veya aynı bilgi zaten aktif olabilir."
+      );
+    }
+
+    return `**${matches[0].title}** kaydını hafızama geri yükledim. 🧠`;
+  }
+
+  const updateCommand = parseMemoryUpdateCommand(userMessage);
+
+  if (updateCommand !== null) {
+    const matches = findSavedEceKnowledgeByTitle(
+      updateCommand.title
+    );
+
+    if (matches.length === 0) {
+      return (
+        `"${updateCommand.title}" başlıklı ` +
+        "aktif hafıza kaydı bulamadım."
+      );
+    }
+
+    if (matches.length > 1) {
+      return (
+        `"${updateCommand.title}" başlığıyla ` +
+        "birden fazla aktif kayıt var. " +
+        "Yanlış bilgiyi değiştirmemek için " +
+        "hiçbir güncelleme yapmadım."
+      );
+    }
+
+    const updated = updateEceKnowledge(
+      matches[0].id,
+      updateCommand.content
+    );
+
+    if (!updated) {
+      return (
+        "Hafıza kaydı güncellenemedi. " +
+        "Kayıt değişmiş veya başka bir bilgiyle " +
+        "çakışmış olabilir."
+      );
+    }
+    return [
+      "Hafızamdaki bilgiyi güncelledim. 🧠",
+      "",
+      `**Başlık:** ${matches[0].title}`,
+      `**Yeni içerik:** ${updateCommand.content}`,
+      `**Kayıt kimliği:** ${matches[0].id}`,
+    ].join("\n");
+  }
   const isMemoryQuestion =
     /(hafıza|hafızan|hatırlıyor musun|ne kayıtlı|kaydettiğin)/iu
       .test(userMessage);
