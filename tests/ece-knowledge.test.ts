@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-
+import { DatabaseSync } from "node:sqlite";
 import {
   getKnowledgeDatabase,
   saveEceKnowledge,
@@ -25,6 +25,38 @@ test("Ece bir fikri kalıcı hafızaya kaydeder", () => {
     content: "AI destekli emlak ofisi geliştirme fikri.",
     project: "ARKEMX",
   });
+
+  const duplicate = saveEceKnowledge({
+    kind: "idea",
+    title: "Sanal Emlak Ofisi",
+    content: "AI destekli emlak ofisi geliştirme fikri.",
+    project: "ARKEMX",
+  });
+
+  assert.equal(duplicate.id, saved.id);
+
+  assert.throws(() => {
+    const db = getKnowledgeDatabase();
+    const now = new Date().toISOString();
+
+    db.prepare(`
+      INSERT INTO ece_knowledge (
+        id, kind, status, title, content,
+        project, source_message_id,
+        created_at, updated_at
+      )
+      VALUES (?, ?, 'saved', ?, ?, ?, NULL, ?, ?)
+    `).run(
+      "duplicate-test-id",
+      saved.kind,
+      saved.title,
+      saved.content,
+      saved.project,
+      now,
+      now
+    );
+  }, /UNIQUE constraint failed/);
+  assert.equal(listEceKnowledge().length, 1);
 
   const row = getKnowledgeDatabase()
     .prepare(
@@ -57,4 +89,36 @@ test("Ece bir fikri kalıcı hafızaya kaydeder", () => {
 
   assert.equal(missing.length, 0);
 
+  const secondDb = new DatabaseSync(
+    join(directory, "studio.sqlite")
+  );
+
+  try {
+    const result = secondDb.prepare(`
+      INSERT INTO ece_knowledge (
+        id, kind, status, title, content,
+        project, source_message_id,
+        created_at, updated_at
+      )
+      SELECT
+        ?, kind, status, title, content,
+        project, source_message_id,
+        created_at, updated_at
+      FROM ece_knowledge
+      WHERE id = ?
+      ON CONFLICT DO NOTHING
+    `).run("second-connection-test", saved.id);
+
+    assert.equal(result.changes, 0);
+
+    const count = secondDb.prepare(`
+      SELECT COUNT(*) AS total
+      FROM ece_knowledge
+      WHERE status = 'saved'
+    `).get() as { total: number };
+
+    assert.equal(count.total, 1);
+  } finally {
+    secondDb.close();
+  }
 });

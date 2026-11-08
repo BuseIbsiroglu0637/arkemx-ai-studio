@@ -60,6 +60,15 @@ export function getKnowledgeDatabase(): DatabaseSync {
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
     );
+    CREATE UNIQUE INDEX IF NOT EXISTS
+      idx_ece_knowledge_saved_unique
+    ON ece_knowledge (
+      kind,
+      title,
+      content,
+      IFNULL(project, '')
+    )
+    WHERE status = 'saved';
   `);
 
   knowledgeDatabase = db;
@@ -85,6 +94,35 @@ export function saveEceKnowledge(input: {
     throw new Error("Hafıza bilgisi geçersiz.");
   }
 
+  const existing = getKnowledgeDatabase().prepare(`
+    SELECT
+      id,
+      kind,
+      status,
+      title,
+      content,
+      project,
+      source_message_id AS sourceMessageId,
+      created_at AS createdAt,
+      updated_at AS updatedAt
+    FROM ece_knowledge
+    WHERE kind = ?
+      AND title = ?
+      AND content = ?
+      AND project IS ?
+      AND status = 'saved'
+    LIMIT 1
+  `).get(
+    input.kind,
+    title,
+    content,
+    input.project?.trim() || null
+  ) as EceKnowledge | undefined;
+
+  if (existing) {
+    return existing;
+  }
+
   const now = new Date().toISOString();
 
   const record: EceKnowledge = {
@@ -100,14 +138,14 @@ export function saveEceKnowledge(input: {
   };
 
   const db = getKnowledgeDatabase();
-
-  db.prepare(`
+  const result = db.prepare(`
     INSERT INTO ece_knowledge (
       id, kind, status, title, content,
       project, source_message_id,
       created_at, updated_at
     )
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ON CONFLICT DO NOTHING
   `).run(
     record.id,
     record.kind,
@@ -120,9 +158,34 @@ export function saveEceKnowledge(input: {
     record.updatedAt
   );
 
+  if (result.changes === 0) {
+    const existing = db.prepare(`
+      SELECT
+        id, kind, status, title, content, project,
+        source_message_id AS sourceMessageId,
+        created_at AS createdAt,
+        updated_at AS updatedAt
+      FROM ece_knowledge
+      WHERE kind = ?
+        AND title = ?
+        AND content = ?
+        AND project IS ?
+        AND status = 'saved'
+      LIMIT 1
+    `).get(
+      record.kind,
+      record.title,
+      record.content,
+      record.project
+    ) as EceKnowledge | undefined;
+
+    if (!existing) {
+      throw new Error("Kayıt çakışması çözümlenemedi.");
+    }
+    return existing;
+  }
   return record;
 }
-
 export function listEceKnowledge(
   limit = 20
 ): EceKnowledge[] {
