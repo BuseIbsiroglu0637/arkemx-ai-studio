@@ -1,56 +1,54 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { captureSpeech, type RecognitionConstructor } from "@/domain/speech-capture";
+import { createVoiceConversation, type ConversationPhase } from "@/domain/voice-conversation";
+import type { RecognitionConstructor } from "@/domain/speech-capture";
 import "./voice-input.css";
 
 type Props = {
-  disabled: boolean; hasDraft: boolean; onStart(): void;
-  onActiveChange(active: boolean): void; onSubmit(text: string): void;
+  disabled: boolean; hasDraft: boolean; speaking: boolean; pendingReply: boolean; onCancelReply(): void; onClearDraft(): void;
+  onStopOutput(): void; onActiveChange(active: boolean): void; onSessionChange(active: boolean): void;
+  onSubmit(text: string, isCurrent: () => boolean): Promise<boolean>;
 };
 
 export default function VoiceInput(props: Props) {
   const [supported, setSupported] = useState<boolean | null>(null);
-  const [active, setActive] = useState(false);
+  const [phase, setPhase] = useState<ConversationPhase>("idle");
   const [preview, setPreview] = useState("");
   const [error, setError] = useState("");
   const callbacks = useRef(props);
-  const constructor = useRef<RecognitionConstructor | null>(null);
-  const capture = useRef<ReturnType<typeof captureSpeech> | null>(null);
+  const conversation = useRef<ReturnType<typeof createVoiceConversation> | null>(null);
   useEffect(() => { callbacks.current = props; }, [props]);
   useEffect(() => {
     const browser = window as unknown as { SpeechRecognition?: RecognitionConstructor; webkitSpeechRecognition?: RecognitionConstructor };
-    constructor.current = browser.SpeechRecognition || browser.webkitSpeechRecognition || null;
-    setSupported(Boolean(constructor.current));
-    const onVisibilityChange = () => { if (document.hidden) capture.current?.cancel(); };
-    document.addEventListener("visibilitychange", onVisibilityChange);
-    return () => { document.removeEventListener("visibilitychange", onVisibilityChange); capture.current?.dispose(); };
+    const Recognition = browser.SpeechRecognition || browser.webkitSpeechRecognition;
+    setSupported(Boolean(Recognition));
+    if (!Recognition) return;
+    const session = createVoiceConversation({
+      recognition: () => new Recognition(),
+      reply: (text, current) => callbacks.current.onSubmit(text, current),
+      stopOutput: () => callbacks.current.onStopOutput(),
+      preview: setPreview, error: setError,
+      phase: value => { setPhase(value); callbacks.current.onActiveChange(value === "listening"); callbacks.current.onSessionChange(value !== "idle"); },
+    });
+    conversation.current = session;
+    const onVisibility = () => { if (document.hidden) session.stop(); };
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => { document.removeEventListener("visibilitychange", onVisibility); session.dispose(); conversation.current = null; };
   }, []);
-
-  function start() {
-    if (!constructor.current || active || props.disabled || props.hasDraft) return;
-    capture.current?.dispose();
-    setPreview(""); setError("");
-    props.onStart(); setActive(true); props.onActiveChange(true);
-    try {
-      capture.current = captureSpeech(new constructor.current(), {
-        preview: setPreview,
-        complete: text => callbacks.current.onSubmit(text),
-        error: setError,
-        end: () => { setActive(false); callbacks.current.onActiveChange(false); },
-      });
-    } catch { setActive(false); props.onActiveChange(false); setError("Mikrofon başlatılamadı."); }
-  }
-
-  return <section className="ece-voice-input" aria-label="Ece ile sesli sohbet">
+  const active = phase !== "idle";
+  return <section className={`ece-voice-input ${active ? "is-active" : ""}`} aria-label="Ece ile sesli görüşme">
     <div className="ece-voice-buttons">
-      {active ? <><button type="button" onClick={() => capture.current?.stop()}>Dinlemeyi bitir ve gönder</button><button type="button" onClick={() => { capture.current?.cancel(); setPreview(""); }}>İptal</button></>
-        : <button type="button" onClick={start} disabled={props.disabled || props.hasDraft || !supported}>Mikrofonla konuş</button>}
-      <span role="status">{active ? "Seni dinliyorum… Konuşman bitince Ece’ye gönderilecek." : "Türkçe dinleme · Türkçe sesli yanıt"}</span>
+      {!active ? <button type="button" className="voice-start" onClick={() => { setError(""); conversation.current?.start(); }} disabled={props.disabled || props.hasDraft || !supported}>◉ Sesli görüşmeyi başlat</button>
+        : <><button type="button" className="voice-end" onClick={() => conversation.current?.stop()}>Görüşmeyi bitir</button>
+          {phase === "listening" ? <button type="button" onClick={() => conversation.current?.finishUtterance()}>Sözümü bitirdim</button>
+            : props.speaking && <button type="button" onClick={() => conversation.current?.interrupt()}>Söz al</button>}</>}
+      <span role="status"><i className={active ? "voice-dot active" : "voice-dot"} />{phase === "listening" ? "Seni dinliyorum" : phase === "responding" ? props.speaking ? "Ece konuşuyor" : "Ece yanıtını hazırlıyor" : props.pendingReply ? "Önceki yanıt bekleniyor" : "Yazmadan, Türkçe konuşarak devam et"}</span>
     </div>
-    {preview && <p className="ece-voice-transcript" aria-live="polite"><strong>Duyduğum:</strong> {preview}</p>}
+    {!active && props.pendingReply && <button type="button" onClick={props.onCancelReply}>Bekleyen isteği durdur</button>}
+    {preview && <p className="ece-voice-transcript"><strong>Sen:</strong> {preview}</p>}
     {error && <p role="alert">{error}</p>}
-    {supported === false ? <p>Bu tarayıcı sesli girişi desteklemiyor. Bu sayfayı güncel Chrome’da açabilir veya yazıyla devam edebilirsin.</p>
-      : <p>Mikrofon yalnız sen başlattığında açılır. Tarayıcı, sesini yazıya çevirmek için çevrimiçi konuşma servisine gönderebilir. Ece yanıtladıktan sonra tekrar konuşmak için düğmeye bas.</p>}
-    {props.hasDraft && !active && <p>Önce yazdığın taslağı gönder veya temizle.</p>}
+    {supported === false ? <p>Bu tarayıcı sesli görüşmeyi desteklemiyor. Güncel Chrome’da açabilir veya yazıyla devam edebilirsin.</p>
+      : <p>{active ? "Ece’nin yanıtı bitince yeniden seni dinleyeceğim. Sekmeden ayrılınca görüşme kapanır." : "Mikrofon görüşme boyunca sırayla açılır. Tarayıcı sesi çevrimiçi tanıma servisine gönderebilir."}</p>}
+    {props.hasDraft && !active && <div><p>Başlamadan önce yazdığın taslağı gönder veya temizle.</p><button type="button" onClick={props.onClearDraft}>Taslağı temizle</button></div>}
   </section>;
 }

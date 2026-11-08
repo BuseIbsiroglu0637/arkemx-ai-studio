@@ -7,6 +7,8 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import DecisionCenter from "./decision-center";
 import EceAvatar from "./ece-avatar";
 import VoiceInput from "./voice-input";
+import KnowledgePanel from "./knowledge-panel";
+import "./workspace.css";
 
 import type { WorkPlanDraft } from "@/domain/work-plan";
 
@@ -155,7 +157,11 @@ export default function EcePage() {
 
     const [openingPlan, setOpeningPlan] = useState(false);
     const [listening, setListening] = useState(false);
+    const [voiceSession, setVoiceSession] = useState(false);
+    const [memoryOpen, setMemoryOpen] = useState(false);
+    const playbackSettle = useRef<((finished: boolean) => void) | null>(null);
     const chatRequestInFlight = useRef(false);
+    const chatAbort = useRef<AbortController | null>(null);
     const [speaking, setSpeaking] = useState(false);
     const [voiceLoading, setVoiceLoading] = useState(false);
     const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -258,7 +264,13 @@ export default function EcePage() {
 
     // Ece'nin sesi tarayıcı/Windows seslerine bağlı değildir.
     // /api/agents/ece/voice sunucuda Edge TTS EmelNeural MP3 üretir.
+    function stopConversationOutput() {
+        chatAbort.current?.abort();
+        stopEceVoice();
+    }
     function stopEceVoice() {
+        playbackSettle.current?.(false);
+        playbackSettle.current = null;
         voiceRequestRef.current?.abort();
         voiceRequestRef.current = null;
         if (audioRef.current) {
@@ -278,13 +290,16 @@ export default function EcePage() {
 
     useEffect(() => {
         return () => {
+            chatAbort.current?.abort();
+            playbackSettle.current?.(false);
+            playbackSettle.current = null;
             voiceRequestRef.current?.abort();
             audioRef.current?.pause();
             if (audioUrlRef.current) URL.revokeObjectURL(audioUrlRef.current);
         };
     }, []);
 
-    async function speakEce(text: string) {
+    async function speakEce(text: string): Promise<boolean> {
         stopEceVoice();
 
         const content = text.replace(/```[\s\S]*?```/g, "")
@@ -293,7 +308,7 @@ export default function EcePage() {
             .replace(/[*_#`]/g, "").trim();
         if (!content) {
             setError("Seslendirilecek metin bulunamadı.");
-            return;
+            return false;
         }
 
         const controller = new AbortController();
@@ -319,13 +334,18 @@ export default function EcePage() {
             }
 
             const blob = await response.blob();
-            if (controller.signal.aborted) return;
+            if (controller.signal.aborted) return false;
             const url = URL.createObjectURL(blob);
             audioUrlRef.current = url;
             const audio = new Audio(url);
             audioRef.current = audio;
+            const completed = new Promise<boolean>(resolve => { playbackSettle.current = resolve; });
             audio.onended = () => {
-                if (audioRef.current === audio) stopEceVoice();
+                if (audioRef.current === audio) {
+                    playbackSettle.current?.(true);
+                    playbackSettle.current = null;
+                    stopEceVoice();
+                }
             };
             audio.onerror = () => {
                 if (audioRef.current === audio) {
@@ -336,6 +356,7 @@ export default function EcePage() {
             setVoiceLoading(false);
             await audio.play();
             if (audioRef.current === audio) setSpeaking(true);
+            return await completed;
         } catch (failure) {
             if (!controller.signal.aborted) {
                 stopEceVoice();
@@ -343,6 +364,7 @@ export default function EcePage() {
                     ? "Tarayıcı otomatik sesi engelledi. Yanıtın yanındaki seslendirme düğmesine basabilirsin."
                     : failure instanceof Error ? failure.message : "Ses üretilemedi.");
             }
+            return false;
         } finally {
             if (voiceRequestRef.current === controller) {
                 voiceRequestRef.current = null;
@@ -357,12 +379,12 @@ export default function EcePage() {
         await submitChat(input, false);
     }
 
-    async function submitChat(message: string, speakReply: boolean) {
+    async function submitChat(message: string, speakReply: boolean, isCurrent: () => boolean = () => true): Promise<boolean> {
         const text = message.trim();
 
         if (!text || chatRequestInFlight.current || loading || planning || historyLoading || checking || saving || plansLoading || openingPlan)
 
-            return;
+            return false;
 
         chatRequestInFlight.current = true;
         stopEceVoice();
@@ -380,6 +402,9 @@ export default function EcePage() {
 
         setError("");
 
+        const controller = new AbortController();
+        chatAbort.current = controller;
+        const timeout = setTimeout(() => controller.abort(new DOMException("Yanıt süresi doldu", "TimeoutError")), speakReply ? 55_000 : 130_000);
         try {
 
             const response = await fetch("/api/agents/ece/chat", {
@@ -388,11 +413,14 @@ export default function EcePage() {
 
                 headers: { "Content-Type": "application/json" },
 
-                body: JSON.stringify({ message: text }),
+                body: JSON.stringify({ message: text, mode: speakReply ? "voice" : "text" }),
+                signal: controller.signal,
 
             });
 
             const result = await response.json();
+            clearTimeout(timeout);
+            controller.signal.throwIfAborted();
 
             if (!response.ok) {
 
@@ -413,23 +441,29 @@ export default function EcePage() {
                 { role: "assistant", content: result.data.reply },
 
             ]);
-            if (speakReply) await speakEce(result.data.reply);
+            if (speakReply) return isCurrent() ? await speakEce(result.data.reply) : false;
+            return true;
 
         }
 
         catch (failure) {
 
-            setError(failure instanceof Error ? failure.message : "Bağlantı hatası.");
+            setError(controller.signal.aborted
+                ? controller.signal.reason?.name === "TimeoutError" ? "Yanıt süresi doldu. Mesajın taslakta korundu." : "İstek durduruldu. Mesajın taslakta korundu."
+                : failure instanceof Error ? failure.message : "Bağlantı hatası.");
 
             // Başarısız gönderimi geri al; kullanıcı mesajı yeniden deneyebilsin.
             setMessages((previous) => previous.slice(0, -1));
 
             setInput(text);
+            return false;
 
         }
 
         finally {
 
+            clearTimeout(timeout);
+            if (chatAbort.current === controller) chatAbort.current = null;
             chatRequestInFlight.current = false;
             setLoading(false);
 
@@ -963,9 +997,9 @@ export default function EcePage() {
 
     }
 
-    const busy = listening || loading || planning || historyLoading || checking || saving || plansLoading || openingPlan;
+    const busy = voiceSession || listening || loading || planning || historyLoading || checking || saving || plansLoading || openingPlan;
 
-    return (<main className="ece-page" style={{
+    return (<main className="ece-page ece-workspace" style={{
 
             minHeight: "100vh",
 
@@ -995,118 +1029,17 @@ export default function EcePage() {
 
         }}>
 
-        <header className="ece-office-header" style={{
-
-            padding: 24,
-
-            borderBottom: "1px solid #e5ebe4",
-
-        }}>
-
-          <a href="/" style={{
-
-            color: "#54765c",
-
-            fontSize: 14,
-
-            textDecoration: "none",
-
-        }}>
-
-            ← Ekibime dön
-
-          </a>
-
-          <div style={{
-
-            display: "flex",
-
-            alignItems: "center",
-
-            gap: 16,
-
-            marginTop: 18,
-
-        }}>
-
-            <div style={{
-
-            width: 58,
-
-            height: 58,
-
-            borderRadius: 18,
-
-            background: "#dce8dd",
-
-            display: "grid",
-
-            placeItems: "center",
-
-            fontSize: 25,
-
-            fontWeight: 700,
-
-            color: "#426b58",
-
-        }}>
-
-              E
-
-            </div>
-
-            <div>
-
-              <h1 style={{ margin: 0, fontSize: 25 }}>Ece</h1>
-
-              <p style={{
-
-            margin: "5px 0",
-
-            fontSize: 14,
-
-            color: "#697b6e",
-
-        }}>
-
-                AI Ekip ve Ürün Lideri
-
-              </p>
-
-              <small style={{ color: "#53745c" }}>
-
-                ● Sohbet: qwen3.5:4b · Planlama: qwen2.5:1.5b
-
-              </small>
-              <p style={{ margin: "12px 0 0", fontSize: 13, color: "#d5c0ee" }}>
-                🎙 Ece'nin sesi: Emel · Türkçe kadın sesi (Edge TTS)
-              </p>
-              <div style={{ marginTop: 12, display: "flex", gap: 8, flexWrap: "wrap" }}>
-                {(speaking || voiceLoading) && (
-                  <button
-                    type="button"
-                    onClick={stopEceVoice}
-                    style={{
-                      padding: "8px 13px",
-                      borderRadius: 10,
-                      background: "#352449",
-                      color: "#f1e8ff",
-                      border: "1px solid #6d4b97",
-                    }}
-                  >
-                    ■ Sesi durdur
-                  </button>
-                )}
-              </div>
-
-            </div>
-
-          </div>
-
+        <header className="ece-office-header workspace-header">
+          <a href="/" className="workspace-brand">✦ <span>ARKEMX <small>AI STUDIO</small></span></a>
+          <div className="workspace-title"><span className="workspace-eyebrow">BİRLİKTE ÇALIŞMA ALANI</span><h1>Ece’nin ofisi</h1><p>Konuş, birlikte düşün, kaldığın yerden devam et.</p></div>
+          <nav aria-label="Ofis araçları"><a href="/team">Ekibim</a><button type="button" disabled={voiceSession} aria-expanded={memoryOpen} onClick={() => setMemoryOpen(v => !v)}>Hafıza</button></nav>
         </header>
+        {memoryOpen && <KnowledgePanel refresh={messages.length} onClose={() => setMemoryOpen(false)} onEdit={command => { setInput(command); setMemoryOpen(false); }} />}
 
         <section className="ece-office-left" aria-label="Ece'nin çalışma alanı">
-          <EceAvatar speaking={speaking} thinking={loading || planning} />
+          <EceAvatar setting="office" showIntro={false} speaking={speaking} thinking={(loading && !speaking) || planning} />
+          <div className="workspace-person"><div><span className="workspace-eyebrow">EKİP & ÜRÜN LİDERİN</span><h2>Ece</h2></div><span className={`workspace-presence ${listening ? "is-listening" : ""}`} role="status">{listening ? "Seni dinliyor" : speaking ? "Konuşuyor" : voiceLoading ? "Sesini hazırlıyor" : loading || planning ? "Düşünüyor" : "Birlikte çalışmaya hazır"}</span></div>
+          <details className="workspace-tools"><summary>Kararlar ve iş planları</summary>
           <div className="ece-office-tools">
             <DecisionCenter />
             <div className="ece-office-saved" style={{ padding: "14px 24px", borderBottom: "1px solid #e5ebe4" }}>
@@ -1235,9 +1168,23 @@ export default function EcePage() {
 
             </div>
           </div>
+          </details>
         </section>
 
         <section className="ece-office-chat" aria-label="Ece ile sohbet">
+          <div className="workspace-chat-heading"><div><span className="workspace-eyebrow">ECE İLE GÖRÜŞMEN</span><h2>Bugün ne üzerinde çalışalım?</h2></div><span>Türkçe sesli görüşme</span>{(speaking || voiceLoading) && <button type="button" onClick={stopEceVoice}>Sesi durdur</button>}</div>
+          <VoiceInput
+            disabled={loading || planning || historyLoading || checking || saving || plansLoading || openingPlan}
+            hasDraft={Boolean(input.trim())}
+            speaking={speaking}
+            onStopOutput={stopConversationOutput}
+            pendingReply={loading}
+            onCancelReply={stopConversationOutput}
+            onClearDraft={() => { setInput(""); setError(""); }}
+            onSessionChange={setVoiceSession}
+            onActiveChange={setListening}
+            onSubmit={(text, current) => submitChat(text, true, current)}
+          />
           <section ref={chatScrollRef} className="ece-office-history" aria-label="Ece sohbet geçmişi" style={{
 
             height: "55vh",
@@ -1354,7 +1301,7 @@ export default function EcePage() {
               {item.role === "assistant" && (
                 <button
                   type="button"
-                  onClick={() => speakEce(item.content)}
+                  disabled={voiceSession} onClick={() => { void speakEce(item.content); }}
                   style={{
                     marginTop: 10,
                     padding: "6px 10px",
@@ -1701,7 +1648,7 @@ export default function EcePage() {
 
             </div>)}
 
-          {loading && (<div style={{
+          {loading && !speaking && !voiceLoading && (<div className="workspace-waiting" role="status" style={{
 
                 alignSelf: "flex-start",
 
@@ -1773,14 +1720,8 @@ export default function EcePage() {
 
         }}>
 
-          <VoiceInput
-            disabled={loading || planning || historyLoading || checking || saving || plansLoading || openingPlan}
-            hasDraft={Boolean(input.trim())}
-            onStart={stopEceVoice}
-            onActiveChange={setListening}
-            onSubmit={text => { void submitChat(text, true); }}
-          />
-          <textarea aria-label="Ece'ye mesajın" disabled={listening} value={input} onChange={(event) => setInput(event.target.value)} placeholder="Ece'ye mesaj veya iş planı hedefi yaz..." maxLength={2000} rows={3} style={{
+
+          <textarea aria-label="Ece'ye mesajın" disabled={voiceSession || listening} value={input} onChange={(event) => setInput(event.target.value)} placeholder="Ece'ye mesaj veya iş planı hedefi yaz..." maxLength={2000} rows={3} style={{
 
             display: "block",
 
@@ -1886,9 +1827,7 @@ export default function EcePage() {
 
         }}>
 
-            Gönder: normal sohbet. İş planı oluştur: görev taslağı.
-
-            Yerel modelle plan hazırlamak biraz sürebilir.
+            Sesli görüşmede yazman gerekmez. Yazılı mesajların ve konuşmaların aynı geçmişte tutulur.
 
           </p>
 

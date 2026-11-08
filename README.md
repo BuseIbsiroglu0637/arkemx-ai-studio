@@ -76,12 +76,23 @@ tests/               Kalıcılık, erişim sınırları ve MCP kontrolleri
 Arayüz ve MCP aynı servisleri kullanır. Model bağlantısı ve iş deneyimi, profil düzenleme isteğiyle taklit edilemez. İleride her çalıştırma, çalışan kimliği ile kullanılan model/talimat sürümüne bağlanacaktır.
 
 
-## Ece ile sesli sohbet
+## Ece ile sesli görüşme
 
-`/ece` sayfasında **Mikrofonla konuş** düğmesine basın ve tarayıcının mikrofon iznini verin. Türkçe konuşma tanıma tamamlanınca yalnızca kesinleşen metin mevcut sohbet API'sine gönderilir. Ece yanıtı metin olarak kaydeder ve Türkçe Emel sesiyle okur. Yeni konuşma için düğmeye yeniden basılır; mikrofon kendiliğinden yeniden açılmaz.
+`/ece` sayfasında **Sesli görüşmeyi başlat** düğmesine basın ve tarayıcının mikrofon iznini verin. Türkçe konuşma tamamlanınca kesinleşen metin mevcut sohbet API'sine gönderilir. Ece yanıtını kaydeder, Türkçe Emel sesiyle okur; sesin `ended` olayı gelince mikrofon yeniden açılır. Mikrofon ve yanıt sesi aynı anda çalışmaz.
 
-**Dinlemeyi bitir ve gönder**, tanımanın son sonucunu bekler; **İptal**, konuşmayı göndermez. Sekme gizlendiğinde veya sayfadan çıkıldığında dinleme iptal edilir. Bir dinleme en fazla 60 saniye sürer. Yazılı taslak varken sesli giriş kapalıdır; mevcut taslak korunur.
+**Sözümü bitirdim** son tanıma sonucunu bekler. Ece konuşurken **Söz al** sesi kesip dinlemeyi başlatır. **Görüşmeyi bitir**, sekmeyi gizleme ve sayfadan çıkma mikrofonu ve oynatımı durdurur. Gecikmiş bir yanıt görüşmeyi yeniden açamaz. Hata veya sessizlikte otomatik yeniden deneme yapılmaz; kullanıcı yeniden başlatır. Her dinleme en fazla 60 saniyedir.
 
-Tarayıcıda `SpeechRecognition` veya `webkitSpeechRecognition` desteği gerekir. Tanıma Türkçe (`tr-TR`) olarak yapılandırılmıştır. Destek bulunamazsa ekranda yazıyla devam seçeneği belirtilir. Bazı tarayıcılar sesi çevrimiçi tanıma servisine gönderir; bu özellik çevrimdışı ya da tamamen yerel tanıma garantisi vermez. Uygulama mikrofon ses dosyasını kendi sunucusuna kaydetmez; tanınan metin mevcut sohbet geçmişinin bir parçasıdır. [SpeechRecognition davranışı](https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition).
+Tarayıcıda `SpeechRecognition` veya `webkitSpeechRecognition` desteği gerekir; dil `tr-TR` olarak ayarlanır. Bazı tarayıcılar sesi çevrimiçi tanıma servisine gönderir; bu özellik tamamen yerel tanıma garantisi vermez. Uygulama ham mikrofon ses dosyası kaydetmez; tanınan metin sohbet geçmişine eklenir. [SpeechRecognition davranışı](https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition).
 
-Tarayıcı otomatik yanıt sesini engellerse mesajdaki **Yanıtı dinle** düğmesi kullanılabilir. Gerçek mikrofon kalitesi ve tanıma servisinin erişilebilirliği kullanıcının tarayıcısında ayrıca denenmelidir.
+Tarayıcı otomatik yanıt sesini engellerse görüşme durur; mesajdaki **Yanıtı dinle** düğmesi kullanılabilir. Gerçek mikrofon ve konuşma tanıma erişimi kullanıcının tarayıcısında ayrıca denenmelidir.
+
+## Ofis ve hafıza paneli
+
+Ana sayfa ve `/ece` aynı masa başı 3D sahnesini kullanır. Hafıza düğmesi, son 50 aktif kaydı salt okunur `/api/agents/ece/knowledge` uç noktasından getirir. Panelde arama yapılabilir. **Sohbette düzenle** yalnızca düzenleme komutunu mesaj taslağına taşır; kullanıcı yeni içeriği yazıp gönderince mevcut hafıza komutu uygulanır. Kayıtlı bilgi, onaylanmış proje kararı olarak etiketlenmez.
+
+
+### Sesli yanıt süresi ve iptal
+
+Yalnızca selamlama içeren mesajlar (`Merhaba`, `Selam Ece` gibi) yerel bir karşılama yanıtı kullanır; soru veya hafıza komutu içeren mesajlar bu kısa yola girmez. Normal yazılı sohbet yapılandırması korunur. `mode: "voice"` istekleri kısa Türkçe yanıt profili ve kurulu `qwen3:1.7b` modeli kullanır; `ECE_VOICE_MODEL` ile sunucudan değiştirilebilir. Bu daha küçük model, kapsamlı yazılı modelle aynı yanıt kalitesini garanti etmez.
+
+Yerel model isteği sesli kipte en fazla 45 saniye, yazılı kipte 120 saniye beklenir. Tarayıcıda ek koruyucu süreler 55/130 saniyedir. TTS üretim süresi bunlardan ayrıdır. **Görüşmeyi bitir** veya **Bekleyen isteği durdur** hem oynatımı hem devam eden sohbet isteğini durdurur; iptal sinyali yerel modele aktarılır. Başarısız veya iptal edilen mesaj taslakta korunur. **Taslağı temizle** ile klavye kullanmadan yeni görüşme başlatılabilir.

@@ -65,10 +65,13 @@ export async function POST(request: Request) {
       );
     }
 
+    const mode = "mode" in body ? body.mode : "text";
+    if (mode !== "voice" && mode !== "text") throw new StudioError(400, "Geçersiz sohbet türü.");
     const userMessage = body.message.trim();
 
     // Ollama'dan gerçek yanıtı al
-    const reply = await chatWithEce(userMessage);
+    const reply = await chatWithEce(userMessage, { mode, signal: request.signal });
+    request.signal.throwIfAborted();
 
     // Başarılı konuşmayı SQLite'a kaydet
     saveEceExchange(userMessage, reply);
@@ -76,7 +79,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       data: {
         agentId: "ece",
-        model: "qwen3.5:4b",
+        model: mode === "voice" ? (process.env.ECE_VOICE_MODEL?.trim() || "qwen3:1.7b") : (process.env.ECE_CHAT_MODEL?.trim() || "qwen3.5:4b"),
         reply,
       },
     });
